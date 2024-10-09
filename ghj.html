@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Поиск простых чисел</title>
+    <style>
+        body {
+            background-color: #121212;
+            color: #ffffff;
+            font-family: 'Arial', sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            text-align: center;
+        }
+
+        h1 {
+            font-size: 2.5em;
+            margin-bottom: 20px;
+            animation: fadeIn 1s;
+        }
+
+        input {
+            font-size: 1.5em;
+            padding: 10px;
+            border: none;
+            border-radius: 5px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            margin: 10px;
+            width: 250px;
+        }
+
+        button {
+            font-size: 1.5em;
+            padding: 10px 20px;
+            background-color: #6200ea;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            margin: 10px;
+        }
+
+        button:hover {
+            background-color: #3700b3;
+        }
+
+        #result {
+            font-size: 1.5em;
+            margin-top: 20px;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center; /* Выравнивание карточек по центру */
+        }
+
+        .prime-card {
+            background-color: #1e1e1e;
+            color: #76ff03;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+            transition: transform 0.3s, box-shadow 0.3s;
+            font-size: 1.5em;
+        }
+
+        .prime-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.7);
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .no-primes {
+            color: #ff5252;
+            font-size: 1.5em;
+            margin-top: 20px;
+        }
+
+        .info {
+            font-size: 1.2em;
+            margin-top: 20px;
+            color: #bb86fc;
+        }
+
+        .timer {
+            margin-top: 20px;
+            font-size: 1.2em;
+            color: #03a9f4;
+        }
+    </style>
+</head>
+<body>
+    <h1>Поиск простых чисел</h1>
+    <input type="text" id="numberInput" placeholder="Введите число" />
+    <button id="findPrimesButton">Найти простые числа</button>
+    <button id="clearButton" style="display: none;">Новый ввод</button>
+    <div id="timer" class="timer" style="display: none;"></div>
+    <div id="result"></div>
+    <div id="info" class="info"></div>
+
+    <script>
+        document.getElementById('findPrimesButton').onclick = function() {
+            const input = document.getElementById('numberInput').value;
+            const limit = BigInt(input);
+            const startTime = performance.now(); // Время начала
+            const primes = findPrimes(limit);
+            const endTime = performance.now(); // Время окончания
+            const timeTaken = endTime - startTime;
+
+            displayResults(primes);
+            displayTimer(timeTaken);
+
+            // Прокрутка к верхней части страницы
+            if (limit > 1000) {
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+        };
+
+        document.getElementById('clearButton').onclick = function() {
+            document.getElementById('numberInput').value = '';
+            document.getElementById('result').innerHTML = '';
+            document.getElementById('timer').style.display = 'none';
+            document.getElementById('info').innerHTML = '';
+            document.getElementById('clearButton').style.display = 'none';
+        };
+
+        function findPrimes(limit) {
+            let primes = [];
+            for (let num = BigInt(2); num <= limit; num++) {
+                if (isPrime(num)) {
+                    primes.push(num.toString());
+                }
+            }
+            return primes;
+        }
+
+        function isPrime(num) {
+            if (num < BigInt(2)) return false;
+            for (let i = BigInt(2); i * i <= num; i++) {
+                if (num % i === BigInt(0)) {
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        function displayResults(primes) {
+            const resultDiv = document.getElementById('result');
+            const infoDiv = document.getElementById('info');
+            resultDiv.innerHTML = ''; // Очищаем предыдущие результаты
+
+            if (primes.length === 0) {
+                resultDiv.innerHTML = '<div class="no-primes">Нет простых чисел.</div>';
+                infoDiv.innerHTML = '';
+            } else {
+                primes.forEach(prime => {
+                    const card = document.createElement('div');
+                    card.className = 'prime-card';
+                    card.innerText = prime;
+                    resultDiv.appendChild(card);
+                });
+                infoDiv.innerHTML = `Количество найденных простых чисел: ${primes.length}`;
+            }
+
+            // Показываем кнопку для нового ввода
+            document.getElementById('clearButton').style.display = primes.length > 0 ? 'block' : 'none';
+        }
+
+        function displayTimer(time) {
+            const timerDiv = document.getElementById('timer');
+            timerDiv.innerHTML = `Время обработки: ${(time).toFixed(2)} мс`;
+            timerDiv.style.display = 'block'; // Показываем таймер
+        }
+    </script>
+</body>
+</html>
+
